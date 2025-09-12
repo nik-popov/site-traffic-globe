@@ -38,7 +38,7 @@ export class Globe extends Server {
             type: "add-marker",
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             position: connection.state!.position,
-          } satisfies OutgoingMessage),
+          } satisfies OutgoingMessage)
         );
 
         // And let's send the new connection's position to all other connections
@@ -47,12 +47,31 @@ export class Globe extends Server {
             JSON.stringify({
               type: "add-marker",
               position,
-            } satisfies OutgoingMessage),
+            } satisfies OutgoingMessage)
           );
         }
       } catch {
         this.onCloseOrError(conn);
       }
+    }
+  }
+
+  onMessage(conn: Connection<ConnectionState>, message: string | Uint8Array) {
+    try {
+      const msg = JSON.parse(message.toString()) as { type: string; id: string; text: string; timestamp: string };
+      if (msg.type === "chat-message" && msg.text && msg.text.length <= 200) {
+        this.broadcast(
+          JSON.stringify({
+            type: "chat-message",
+            id: msg.id,
+            text: msg.text,
+            timestamp: msg.timestamp,
+          } satisfies OutgoingMessage),
+          [conn.id]
+        );
+      }
+    } catch (err) {
+      console.error("Invalid message received:", err);
     }
   }
 
@@ -64,7 +83,7 @@ export class Globe extends Server {
         type: "remove-marker",
         id: connection.id,
       } satisfies OutgoingMessage),
-      [connection.id],
+      [connection.id]
     );
   }
 
@@ -78,10 +97,16 @@ export class Globe extends Server {
 }
 
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: any): Promise<Response> {
+    const url = new URL(request.url);
+    if (url.pathname === "/rooms") {
+      return new Response(JSON.stringify({ rooms: [] }), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     return (
       (await routePartykitRequest(request, { ...env })) ||
       new Response("Not Found", { status: 404 })
     );
   },
-} satisfies ExportedHandler<Env>;
+} satisfies ExportedHandler<any>;
