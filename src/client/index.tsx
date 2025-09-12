@@ -9,11 +9,18 @@ import usePartySocket from "partysocket/react";
 import type { OutgoingMessage } from "../shared";
 import type { LegacyRef } from "react";
 
+const randomNames = [
+  "Rylie", "Peyton", "Jordan", "Taylor", "Alex", "Cameron", "Morgan", "Casey", "Riley", "Reese",
+  "Rowan", "Quinn", "Kai", "Avery", "Sawyer", "Parker", "Dakota", "Skyler", "Frankie", "River"
+];
+
 function App() {
   // A reference to the canvas element where we'll render the globe
   const canvasRef = useRef<HTMLCanvasElement>();
   // The number of markers we're currently displaying
   const [counter, setCounter] = useState(0);
+  // A list of visitors
+  const [users, setUsers] = useState<Map<string, string>>(new Map());
   // A map of marker IDs to their positions
   // Note that we use a ref because the globe's `onRender` callback
   // is called on every animation frame, and we don't want to re-render
@@ -39,11 +46,24 @@ function App() {
           location: [message.position.lat, message.position.lng],
           size: message.position.id === socket.id ? 0.1 : 0.05,
         });
+        // Add user to the list
+        setUsers(prevUsers => {
+          const newUsers = new Map(prevUsers);
+          const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+          newUsers.set(message.position.id, randomName);
+          return newUsers;
+        });
         // Update the counter
         setCounter((c) => c + 1);
       } else {
         // Remove the marker from our map
         positions.current.delete(message.id);
+        // Remove user from the list
+        setUsers(prevUsers => {
+          const newUsers = new Map(prevUsers);
+          newUsers.delete(message.id);
+          return newUsers;
+        });
         // Update the counter
         setCounter((c) => c - 1);
       }
@@ -104,6 +124,15 @@ function App() {
         ref={canvasRef as LegacyRef<HTMLCanvasElement>}
         style={{ width: 400, height: 400, maxWidth: "100%", aspectRatio: 1 }}
       />
+
+      <div className="visitors">
+        <h3>Visitors</h3>
+        <ul>
+          {Array.from(users.entries()).map(([id, name]) => (
+            <li key={id}>{name}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

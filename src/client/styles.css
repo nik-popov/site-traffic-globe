@@ -48,3 +48,27 @@ a {
   text-underline-offset: 3px;
   text-decoration-color: #555;
 }
+
+.visitors {
+  margin-top: 2rem;
+  text-align: left;
+  width: 400px;
+  margin: 2rem auto;
+}
+
+.visitors h3 {
+  color: white;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.visitors ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.visitors li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #333;
+}
