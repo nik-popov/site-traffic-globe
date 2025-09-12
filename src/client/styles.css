@@ -72,3 +72,76 @@ a {
   padding: 0.5rem 0;
   border-bottom: 1px solid #333;
 }
+.App {
+  text-align: center;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.room-actions {
+  margin-bottom: 20px;
+}
+
+.room-actions button {
+  padding: 8px 16px;
+  margin: 0 10px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+}
+
+.room-actions button:hover {
+  background-color: #0056b3;
+}
+
+.join-room {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.join-room input {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.active-rooms {
+  margin-top: 20px;
+}
+
+.active-rooms ul {
+  list-style: none;
+  padding: 0;
+}
+
+.active-rooms li {
+  margin: 5px 0;
+}
+
+.active-rooms button {
+  background: none;
+  color: #007bff;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.active-rooms button:hover {
+  color: #0056b3;
+}
+
+.visitors {
+  margin-top: 20px;
+}
+
+.visitors ul {
+  list-style: none;
+  padding: 0;
+}
+
+.visitors li {
+  margin: 5px 0;
+}
