@@ -26,8 +26,7 @@ function generateRoomName() {
 
 function App() {
   const [room, setRoom] = useState(getRoom());
-  const [roomInput, setRoomInput] = useState("");
-  const [activeRooms, setActiveRooms] = useState<string[]>([]);
+  const [activeRooms, setActiveRooms] = useState<{ id: string; userCount: number }[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>();
   const [counter, setCounter] = useState(0);
   const [users, setUsers] = useState<Map<string, string>>(new Map());
@@ -45,7 +44,7 @@ function App() {
   useEffect(() => {
     fetch("/rooms")
       .then((res) => res.json())
-      .then((data: { rooms: string[] }) => setActiveRooms(data.rooms))
+      .then((data: { rooms: { id: string; userCount: number }[] }) => setActiveRooms(data.rooms))
       .catch((err) => console.error("Failed to fetch rooms:", err));
   }, []);
 
@@ -67,7 +66,7 @@ function App() {
           return newUsers;
         });
         setCounter((c) => c + 1);
-      } else {
+      } else if (message.type === "remove-marker") {
         positions.current.delete(message.id);
         setUsers((prevUsers) => {
           const newUsers = new Map(prevUsers);
@@ -75,6 +74,15 @@ function App() {
           return newUsers;
         });
         setCounter((c) => c - 1);
+      } else if (message.type === "room-update") {
+        setActiveRooms((prev) =>
+          prev.map((r) =>
+            r.id === message.roomId ? { ...r, userCount: message.userCount } : r
+          )
+        );
+        if (message.roomId === room) {
+          setCounter(message.userCount);
+        }
       }
     },
   });
@@ -110,81 +118,87 @@ function App() {
     };
   }, []);
 
-  const handleJoinRoom = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (roomInput.trim()) {
-      window.history.pushState({}, "", `?room=${roomInput.trim()}`);
-      setRoom(roomInput.trim());
-      setRoomInput("");
+  const handleJoinRoom = () => {
+    const roomCode = window.prompt("Enter 6-digit room code:");
+    if (roomCode && /^[a-z0-9]{6}$/.test(roomCode)) {
+      window.history.pushState({}, "", `?room=${roomCode}`);
+      setRoom(roomCode);
+    } else if (roomCode) {
+      window.alert("Invalid room code! Please enter a 6-digit alphanumeric code.");
     }
   };
 
   return (
     <div className="App">
-      <div className="room-actions">
+      <h1>WYA?</h1>
+      <div className="room-controls">
         {room === "default" ? (
-          <>
-            <button
-              onClick={() => {
-                const newRoom = generateRoomName();
-                window.history.pushState({}, "", `?room=${newRoom}`);
-                setRoom(newRoom);
-              }}
-            >
-              Create Room
-            </button>
-            <form onSubmit={handleJoinRoom} className="join-room">
-              <input
-                type="text"
-                value={roomInput}
-                onChange={(e) => setRoomInput(e.target.value)}
-                placeholder="Enter room name"
-                aria-label="Room name"
-              />
-              <button type="submit">Join Room</button>
-            </form>
+          <div className="room-actions">
+            <div className="room-create">
+              <button
+                role="button"
+                onClick={() => {
+                  const newRoom = generateRoomName();
+                  window.history.pushState({}, "", `?room=${newRoom}`);
+                  setRoom(newRoom);
+                }}
+              >
+                Create Room
+              </button>
+            </div>
+            <div className="join-room">
+              <button role="button" onClick={handleJoinRoom}>
+                Join Room
+              </button>
+            </div>
             {activeRooms.length > 0 && (
               <div className="active-rooms">
                 <h3>Active Rooms</h3>
                 <ul>
                   {activeRooms.map((r) => (
-                    <li key={r}>
+                    <li key={r.id}>
                       <button
+                        role="button"
                         onClick={() => {
-                          window.history.pushState({}, "", `?room=${r}`);
-                          setRoom(r);
+                          window.history.pushState({}, "", `?room=${r.id}`);
+                          setRoom(r.id);
                         }}
                       >
-                        {r}
+                        {r.id} ({r.userCount} {r.userCount === 1 ? "user" : "users"})
                       </button>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
-          </>
+          </div>
         ) : (
-          <p>
-            You're in room <b>{room}</b>.{" "}
-            <a href={`?room=${room}`} target="_blank" rel="noopener noreferrer">
-              Share this link
-            </a>{" "}
-            or <a href="/">go back to the main globe</a>.
-          </p>
+          <div className="room-info">
+            <p>
+              You're in room <b>{room}</b>.{" "}
+              <a href={`?room=${room}`} target="_blank" rel="noopener noreferrer">
+                Share this link
+              </a>{" "}
+              or <a href="/">go back to the main globe</a>.
+            </p>
+          </div>
         )}
       </div>
-      <h1>WYA?</h1>
-      {counter !== 0 ? (
-        <p>
-          <b>{counter}</b> {counter === 1 ? "person" : "people"} connected.
-        </p>
-      ) : (
-        <p>&nbsp;</p>
-      )}
-      <canvas
-        ref={canvasRef as LegacyRef<HTMLCanvasElement>}
-        style={{ width: 400, height: 400, maxWidth: "100%", aspectRatio: 1 }}
-      />
+      <div className="status">
+        {counter !== 0 ? (
+          <p>
+            <b>{counter}</b> {counter === 1 ? "person" : "people"} connected.
+          </p>
+        ) : (
+          <p>&nbsp;</p>
+        )}
+      </div>
+      <div className="globe-container">
+        <canvas
+          ref={canvasRef as LegacyRef<HTMLCanvasElement>}
+          style={{ width: 400, height: 400, maxWidth: "100%", aspectRatio: 1 }}
+        />
+      </div>
       <div className="visitors">
         <h3>Visitors</h3>
         <ul>

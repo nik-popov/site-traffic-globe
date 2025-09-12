@@ -26,6 +26,8 @@ h1, h2, h3, h4, h5, h6 {
 .App {
   text-align: center;
   padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 b {
@@ -45,46 +47,71 @@ a:hover {
   text-decoration-color: #ffffff;
 }
 
+.room-controls {
+  margin-bottom: 2rem;
+}
+
 .room-actions {
-  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
-.room-actions button {
-  padding: 8px 16px;
-  margin: 0 10px;
-  cursor: pointer;
-  background-color: #333333; /* Dark grey button */
-  color: #ffffff; /* White text */
+.room-create {
+  width: 100%;
+  max-width: 200px;
+}
+
+.room-create button {
+  background: none;
   border: none;
-  border-radius: 4px;
-  transition: background-color 0.2s ease;
+  color: #d1d1d1; /* Light grey to match links */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #666666; /* Medium grey underline */
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
-.room-actions button:hover {
-  background-color: #4d4d4d; /* Lighter grey on hover */
+.room-create button:hover {
+  color: #ffffff; /* White on hover to match links */
+  text-decoration-color: #ffffff;
 }
 
 .join-room {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  width: 100%;
+  max-width: 200px;
 }
 
-.join-room input {
-  padding: 8px;
-  border: 1px solid #666666; /* Medium grey border */
-  border-radius: 4px;
-  background-color: #2a2a2a; /* Slightly lighter than body */
-  color: #d1d1d1; /* Light grey text */
+.join-room button {
+  background: none;
+  border: none;
+  color: #d1d1d1; /* Light grey to match links */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #666666; /* Medium grey underline */
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px;
+  width: 100%;
+  text-align: center;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
-.join-room input:focus {
-  outline: none;
-  border-color: #ffffff; /* White border on focus */
+.join-room button:hover {
+  color: #ffffff; /* White on hover to match links */
+  text-decoration-color: #ffffff;
 }
 
 .active-rooms {
-  margin-top: 20px;
+  width: 100%;
+  max-width: 300px;
+  text-align: left;
 }
 
 .active-rooms h3 {
@@ -96,6 +123,7 @@ a:hover {
 .active-rooms ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .active-rooms li {
@@ -104,23 +132,40 @@ a:hover {
 
 .active-rooms button {
   background: none;
-  color: #d1d1d1; /* Light grey for room buttons */
   border: none;
-  cursor: pointer;
+  color: #d1d1d1; /* Light grey to match links */
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-color: #666666; /* Medium grey underline */
+  font-size: 16px;
+  cursor: pointer;
+  padding: 5px 0;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
 }
 
 .active-rooms button:hover {
-  color: #ffffff; /* White on hover */
+  color: #ffffff; /* White on hover to match links */
   text-decoration-color: #ffffff;
 }
 
+.room-info {
+  margin-bottom: 1rem;
+}
+
+.status {
+  margin-bottom: 1.5rem;
+}
+
+.globe-container {
+  margin: 2rem auto;
+  max-width: 400px;
+}
+
 .visitors {
-  margin-top: 20px;
+  margin-top: 2rem;
   text-align: left;
-  width: 400px;
+  width: 100%;
+  max-width: 400px;
   margin: 2rem auto;
 }
 
