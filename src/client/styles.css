@@ -1,30 +1,20 @@
-/* 
-  We've already included normalize.css. 
-
-  But we'd like a modern looking boilerplate. 
-  Clean type, sans-serif, and a nice color palette. 
-  
-*/
-
+/* Modern grey, black, and white theme with clean typography */
 body {
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #999;
-  background-color: black;
+  color: #d1d1d1; /* Light grey for body text */
+  background-color: #1a1a1a; /* Dark grey background */
   text-align: center;
   padding-top: 40px;
+  margin: 0;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: sans-serif;
+h1, h2, h3, h4, h5, h6 {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-weight: 600;
   line-height: 1.25;
+  color: #ffffff; /* White for headings */
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
@@ -33,49 +23,26 @@ h6 {
   padding: 1rem;
 }
 
-h1 {
-  color: white;
-}
-
-b {
-  color: white;
-  font-weight: bold;
-}
-
-a {
-  color: #ccc;
-  text-decoration-line: underline;
-  text-underline-offset: 3px;
-  text-decoration-color: #555;
-}
-
-.visitors {
-  margin-top: 2rem;
-  text-align: left;
-  width: 400px;
-  margin: 2rem auto;
-}
-
-.visitors h3 {
-  color: white;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.visitors ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.visitors li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #333;
-}
 .App {
   text-align: center;
   padding: 20px;
-  font-family: Arial, sans-serif;
+}
+
+b {
+  color: #ffffff; /* White for bold text */
+  font-weight: 700;
+}
+
+a {
+  color: #d1d1d1; /* Light grey for links */
+  text-decoration-line: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #666666; /* Medium grey underline */
+}
+
+a:hover {
+  color: #ffffff; /* White on hover */
+  text-decoration-color: #ffffff;
 }
 
 .room-actions {
@@ -86,14 +53,15 @@ a {
   padding: 8px 16px;
   margin: 0 10px;
   cursor: pointer;
-  background-color: #007bff;
-  color: white;
+  background-color: #333333; /* Dark grey button */
+  color: #ffffff; /* White text */
   border: none;
   border-radius: 4px;
+  transition: background-color 0.2s ease;
 }
 
 .room-actions button:hover {
-  background-color: #0056b3;
+  background-color: #4d4d4d; /* Lighter grey on hover */
 }
 
 .join-room {
@@ -104,12 +72,25 @@ a {
 
 .join-room input {
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid #666666; /* Medium grey border */
   border-radius: 4px;
+  background-color: #2a2a2a; /* Slightly lighter than body */
+  color: #d1d1d1; /* Light grey text */
+}
+
+.join-room input:focus {
+  outline: none;
+  border-color: #ffffff; /* White border on focus */
 }
 
 .active-rooms {
   margin-top: 20px;
+}
+
+.active-rooms h3 {
+  color: #ffffff; /* White for heading */
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .active-rooms ul {
@@ -123,25 +104,40 @@ a {
 
 .active-rooms button {
   background: none;
-  color: #007bff;
+  color: #d1d1d1; /* Light grey for room buttons */
   border: none;
   cursor: pointer;
   text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #666666; /* Medium grey underline */
 }
 
 .active-rooms button:hover {
-  color: #0056b3;
+  color: #ffffff; /* White on hover */
+  text-decoration-color: #ffffff;
 }
 
 .visitors {
   margin-top: 20px;
+  text-align: left;
+  width: 400px;
+  margin: 2rem auto;
+}
+
+.visitors h3 {
+  color: #ffffff; /* White for heading */
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
 .visitors ul {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
+  margin: 0;
 }
 
 .visitors li {
-  margin: 5px 0;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #333333; /* Dark grey border */
+  color: #d1d1d1; /* Light grey text */
 }
