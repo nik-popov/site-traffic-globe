@@ -14,17 +14,23 @@ const randomNames = [
   "Rowan", "Quinn", "Kai", "Avery", "Sawyer", "Parker", "Dakota", "Skyler", "Frankie", "River"
 ];
 
+// A simple utility to get the room from the URL
+function getRoom() {
+  return new URLSearchParams(window.location.search).get("room") || "default";
+}
+
+// A simple utility to generate a random room name
+function generateRoomName() {
+  return Math.random().toString(36).substring(2, 8);
+}
+
 function App() {
-  // A reference to the canvas element where we'll render the globe
+  const [room, setRoom] = useState(getRoom());
+  const [roomInput, setRoomInput] = useState("");
+  const [activeRooms, setActiveRooms] = useState<string[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>();
-  // The number of markers we're currently displaying
   const [counter, setCounter] = useState(0);
-  // A list of visitors
   const [users, setUsers] = useState<Map<string, string>>(new Map());
-  // A map of marker IDs to their positions
-  // Note that we use a ref because the globe's `onRender` callback
-  // is called on every animation frame, and we don't want to re-render
-  // the component on every frame.
   const positions = useRef<
     Map<
       string,
@@ -34,48 +40,50 @@ function App() {
       }
     >
   >(new Map());
+
+  // Fetch active rooms
+  useEffect(() => {
+    fetch("/rooms")
+      .then((res) => res.json())
+      .then((data: { rooms: string[] }) => setActiveRooms(data.rooms))
+      .catch((err) => console.error("Failed to fetch rooms:", err));
+  }, []);
+
   // Connect to the PartyServer server
   const socket = usePartySocket({
-    room: "default",
+    room: room,
     party: "globe",
     onMessage(evt) {
       const message = JSON.parse(evt.data as string) as OutgoingMessage;
       if (message.type === "add-marker") {
-        // Add the marker to our map
         positions.current.set(message.position.id, {
           location: [message.position.lat, message.position.lng],
           size: message.position.id === socket.id ? 0.1 : 0.05,
         });
-        // Add user to the list
-        setUsers(prevUsers => {
+        setUsers((prevUsers) => {
           const newUsers = new Map(prevUsers);
           const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
           newUsers.set(message.position.id, randomName);
           return newUsers;
         });
-        // Update the counter
         setCounter((c) => c + 1);
       } else {
-        // Remove the marker from our map
         positions.current.delete(message.id);
-        // Remove user from the list
-        setUsers(prevUsers => {
+        setUsers((prevUsers) => {
           const newUsers = new Map(prevUsers);
           newUsers.delete(message.id);
           return newUsers;
         });
-        // Update the counter
         setCounter((c) => c - 1);
       }
     },
   });
 
   useEffect(() => {
-    // The angle of rotation of the globe
-    // We'll update this on every frame to make the globe spin
     let phi = 0;
+    if (!canvasRef.current) return;
 
-    const globe = createGlobe(canvasRef.current as HTMLCanvasElement, {
+    const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: 400 * 2,
       height: 400 * 2,
@@ -91,13 +99,7 @@ function App() {
       markers: [],
       opacity: 0.7,
       onRender: (state) => {
-        // Called on every animation frame.
-        // `state` will be an empty object, return updated params.
-
-        // Get the current positions from our map
         state.markers = [...positions.current.values()];
-
-        // Rotate the globe
         state.phi = phi;
         phi += 0.01;
       },
@@ -108,8 +110,69 @@ function App() {
     };
   }, []);
 
+  const handleJoinRoom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (roomInput.trim()) {
+      window.history.pushState({}, "", `?room=${roomInput.trim()}`);
+      setRoom(roomInput.trim());
+      setRoomInput("");
+    }
+  };
+
   return (
     <div className="App">
+      <div className="room-actions">
+        {room === "default" ? (
+          <>
+            <button
+              onClick={() => {
+                const newRoom = generateRoomName();
+                window.history.pushState({}, "", `?room=${newRoom}`);
+                setRoom(newRoom);
+              }}
+            >
+              Create Room
+            </button>
+            <form onSubmit={handleJoinRoom} className="join-room">
+              <input
+                type="text"
+                value={roomInput}
+                onChange={(e) => setRoomInput(e.target.value)}
+                placeholder="Enter room name"
+                aria-label="Room name"
+              />
+              <button type="submit">Join Room</button>
+            </form>
+            {activeRooms.length > 0 && (
+              <div className="active-rooms">
+                <h3>Active Rooms</h3>
+                <ul>
+                  {activeRooms.map((r) => (
+                    <li key={r}>
+                      <button
+                        onClick={() => {
+                          window.history.pushState({}, "", `?room=${r}`);
+                          setRoom(r);
+                        }}
+                      >
+                        {r}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
+        ) : (
+          <p>
+            You're in room <b>{room}</b>.{" "}
+            <a href={`?room=${room}`} target="_blank" rel="noopener noreferrer">
+              Share this link
+            </a>{" "}
+            or <a href="/">go back to the main globe</a>.
+          </p>
+        )}
+      </div>
       <h1>WYA?</h1>
       {counter !== 0 ? (
         <p>
@@ -118,13 +181,10 @@ function App() {
       ) : (
         <p>&nbsp;</p>
       )}
-
-      {/* The canvas where we'll render the globe */}
       <canvas
         ref={canvasRef as LegacyRef<HTMLCanvasElement>}
         style={{ width: 400, height: 400, maxWidth: "100%", aspectRatio: 1 }}
       />
-
       <div className="visitors">
         <h3>Visitors</h3>
         <ul>
