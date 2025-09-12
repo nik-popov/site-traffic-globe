@@ -30,6 +30,8 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement>();
   const [counter, setCounter] = useState(0);
   const [users, setUsers] = useState<Map<string, string>>(new Map());
+  const [messages, setMessages] = useState<{ id: string; name: string; text: string; timestamp: string }[]>([]);
+  const [messageInput, setMessageInput] = useState("");
   const positions = useRef<
     Map<
       string,
@@ -39,6 +41,7 @@ function App() {
       }
     >
   >(new Map());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch active rooms
   useEffect(() => {
@@ -47,6 +50,11 @@ function App() {
       .then((data: { rooms: { id: string; userCount: number }[] }) => setActiveRooms(data.rooms))
       .catch((err) => console.error("Failed to fetch rooms:", err));
   }, []);
+
+  // Scroll to the bottom of the message list when new messages are added
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Connect to the PartyServer server
   const socket = usePartySocket({
@@ -75,14 +83,35 @@ function App() {
         });
         setCounter((c) => c - 1);
       } else if (message.type === "room-update") {
-        setActiveRooms((prev) =>
-          prev.map((r) =>
-            r.id === message.roomId ? { ...r, userCount: message.userCount } : r
-          )
-        );
+        setActiveRooms((prev) => {
+          let newRooms = [...prev];
+          const index = newRooms.findIndex((r) => r.id === message.roomId);
+          if (message.userCount > 0) {
+            if (index !== -1) {
+              newRooms[index] = { ...newRooms[index], userCount: message.userCount };
+            } else {
+              newRooms.push({ id: message.roomId, userCount: message.userCount });
+            }
+          } else {
+            if (index !== -1) {
+              newRooms.splice(index, 1);
+            }
+          }
+          return newRooms;
+        });
         if (message.roomId === room) {
           setCounter(message.userCount);
         }
+      } else if (message.type === "chat-message") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: message.id,
+            name: users.get(message.id) || "Unknown",
+            text: message.text,
+            timestamp: message.timestamp,
+          },
+        ]);
       }
     },
   });
@@ -125,6 +154,32 @@ function App() {
       setRoom(roomCode);
     } else if (roomCode) {
       window.alert("Invalid room code! Please enter a 6-digit alphanumeric code.");
+    }
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (messageInput.trim() && messageInput.length <= 200 && room !== "default") {
+      const msg = {
+        type: "chat-message",
+        id: socket.id,
+        text: messageInput.trim(),
+        timestamp: new Date().toISOString(),
+      };
+      socket.send(JSON.stringify(msg));
+      // Add the message to local state immediately
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: msg.id,
+          name: users.get(msg.id) || "Unknown",
+          text: msg.text,
+          timestamp: msg.timestamp,
+        },
+      ]);
+      setMessageInput("");
+    } else if (messageInput.length > 200) {
+      window.alert("Message too long! Maximum 200 characters.");
     }
   };
 
@@ -207,6 +262,35 @@ function App() {
           ))}
         </ul>
       </div>
+      {room !== "default" && (
+        <div className="chat">
+          <h3>Messages</h3>
+          <div className="message-list">
+            {messages.map((msg) => (
+              <div key={`${msg.id}-${msg.timestamp}`} className="message">
+                <span className="message-sender">{msg.name}</span>: {msg.text}
+                <span className="message-timestamp">
+                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                </span>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+          <form onSubmit={handleSendMessage} className="message-form">
+            <input
+              type="text"
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              placeholder="Type a message..."
+              aria-label="Chat message"
+              maxLength={200}
+            />
+            <button type="submit" role="button">
+              Send
+            </button>
+          </form>
+        </div>
+      )}
     </div>
   );
 }

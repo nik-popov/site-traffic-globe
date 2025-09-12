@@ -186,3 +186,83 @@ a:hover {
   border-bottom: 1px solid #333333; /* Dark grey border */
   color: #d1d1d1; /* Light grey text */
 }
+
+.chat {
+  margin-top: 2rem;
+  text-align: left;
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto;
+}
+
+.chat h3 {
+  color: #ffffff; /* White for heading */
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.message-list {
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #2a2a2a; /* Slightly lighter than body */
+  border: 1px solid #333333; /* Dark grey border */
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.message {
+  padding: 5px 0;
+  color: #d1d1d1; /* Light grey text */
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.message-sender {
+  color: #ffffff; /* White for sender name */
+  font-weight: 600;
+}
+
+.message-timestamp {
+  color: #666666; /* Medium grey for timestamp */
+  font-size: 0.85rem;
+  margin-left: auto;
+}
+
+.message-form {
+  display: flex;
+  gap: 10px;
+}
+
+.message-form input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #666666; /* Medium grey border */
+  border-radius: 4px;
+  background-color: #2a2a2a; /* Slightly lighter than body */
+  color: #d1d1d1; /* Light grey text */
+}
+
+.message-form input:focus {
+  outline: none;
+  border-color: #ffffff; /* White border on focus */
+}
+
+.message-form button {
+  background: none;
+  border: none;
+  color: #d1d1d1; /* Light grey to match links */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: #666666; /* Medium grey underline */
+  font-size: 16px;
+  cursor: pointer;
+  padding: 10px;
+  transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.message-form button:hover {
+  color: #ffffff; /* White on hover to match links */
+  text-decoration-color: #ffffff;
+}
